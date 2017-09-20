@@ -1,6 +1,7 @@
-import websocket
-import requests
 import os
+import requests
+import asyncio
+import websockets
 
 
 def check_secrets_sourced():
@@ -22,6 +23,17 @@ def connect(token):
         return response.json().get('url')
 
 
+async def receive_events(ws_url):
+    async with websockets.connect(ws_url) as websocket:
+        while True:
+            print("Waiting...")
+            msg = await websocket.recv()
+            print(msg)
+
+
 if __name__ == '__main__':
     token = check_secrets_sourced()
     websocket_url = connect(token)
+    print(websocket_url)
+
+    asyncio.get_event_loop().run_until_complete(receive_events(websocket_url))
