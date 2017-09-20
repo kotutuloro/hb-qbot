@@ -1,6 +1,7 @@
-click==6.7
-Flask==0.12.2
-itsdangerous==0.24
-Jinja2==2.9.6
-MarkupSafe==1.0
-Werkzeug==0.12.2
+certifi==2017.7.27.1
+chardet==3.0.4
+idna==2.6
+requests==2.18.4
+six==1.11.0
+urllib3==1.22
+websocket-client==0.44.0

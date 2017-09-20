@@ -1,20 +1,27 @@
-from flask import Flask, request
-
-app = Flask(__name__)
-
-
-@app.route('/')
-def test():
-    return 'ur here'
+import websocket
+import requests
+import os
 
 
-@app.route('/events', methods=["POST"])
-def events():
+def check_secrets_sourced():
+    """Errors out if Slack API key not found"""
 
-    chal_id = request.form.get('challenge')
-    print request.form.items()
-    print chal_id
-    return chal_id
+    token = os.getenv('SLACK_BOT_TOKEN')
+    if token:
+        return token
+    else:
+        raise ValueError("No API token found! Have you sourced your secrets?")
+
+
+def connect(token):
+    """Connect to the Slack RTM API"""
+
+    payload = {'token': token}
+    response = requests.post('https://slack.com/api/rtm.connect', data=payload)
+    if response.ok and response.json().get('ok'):
+        return response.json().get('url')
+
 
 if __name__ == '__main__':
-    app.run(port=5050)
+    token = check_secrets_sourced()
+    websocket_url = connect(token)
