@@ -97,19 +97,19 @@ def parse_message(websocket, user, text):
         if user_to_pop:
             user_to_pop = user_to_pop.group(0)
             EVENT_LOOP.create_task(send_message(websocket,
-                                                "They're on their way {}".format(user_to_pop),
+                                                f"They're on their way {user_to_pop}",
                                                 event_id_global))
 
     # If the message indicates they want to be added to the queue:
     elif is_enqueue_message(text):
         EVENT_LOOP.create_task(send_message(websocket,
-                                            "Adding to the queue <@{}>".format(user),
+                                            f"Adding to the queue <@{user}>",
                                             event_id_global))
 
     # If no other conditons met
     else:
         EVENT_LOOP.create_task(send_message(websocket,
-                                            "Sorry <@{}>, I didn't understand that!".format(user),
+                                            f"Sorry <@{user}>, I didn't understand that!",
                                             event_id_global))
 
 
@@ -132,7 +132,6 @@ def is_dequeue_message(text):
             or plain_text.startswith('nq'))
 
 
-
 async def send_message(websocket, msg, local_event_id, channel='C77DZM4F9'):
     """Send a message across the websocket to the specified channel
 
@@ -151,10 +150,10 @@ async def send_message(websocket, msg, local_event_id, channel='C77DZM4F9'):
                            'type': 'message',
                            'channel': channel,
                            'text': msg})
-    print("Sending message {}: {}...".format(local_event_id, msg))
+    print(f"Sending message {local_event_id}: {msg}...")
     # await asyncio.sleep(5)
     await websocket.send(msg_json)
-    print("Sent message {}!".format(local_event_id))
+    print(f"Sent message {local_event_id}!")
 
 
 if __name__ == '__main__':
