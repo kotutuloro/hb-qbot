@@ -3,6 +3,7 @@ import requests
 import asyncio
 import websockets
 import json
+import re
 
 EVENT_LOOP = asyncio.get_event_loop()
 
@@ -37,34 +38,99 @@ async def receive_events(ws_url):
         global event_id_global
         event_id_global = 1
 
+        # TODO: Create a ping coro to ping every x seconds and add to event loop
+
         # Continue waiting for event messages until websocket closes or errors
         while True:
             print("Waiting for events...")
             msg = await websocket.recv()
-            print("Got a message!")
+            print("Got an event!")
 
-            # Parse the received event/message at the next opportunity
-            EVENT_LOOP.call_soon(parse_message, websocket, msg)
+            # Parse the received event at the next opportunity
+            EVENT_LOOP.call_soon(parse_event, websocket, msg)
 
 
-def parse_message(websocket, msg):
-    """Parse message type to determine and send appropriate response"""
+def parse_event(websocket, event):
+    """Parse event type to determine and send appropriate response"""
 
-    msg = json.loads(msg)
-    print("Parsing message:", msg)
+    event = json.loads(event)
+    print("Parsing event:", event)
+    msg_type = event.get('type')
+    reply = event.get('reply_to')
+
+    if reply:
+        return
+        # TODO: Add to dictionary whether previous sent message was successful or not
 
     # Use global event id to for the message ids
     global event_id_global
 
-    # If the event message is initial hello, respond with connection message
-    if msg.get('type') == 'hello':
+    # If the event is initial hello, respond with connection message
+    if msg_type == 'hello':
         EVENT_LOOP.create_task(send_message(websocket,
                                             "QBot is connected!",
                                             event_id_global))
-    if msg.get('type') == 'reconnect_url':
+    # If the event is connection closing goodbye, respond with goodbye
+    if msg_type == 'goodbye':
         EVENT_LOOP.create_task(send_message(websocket,
-                                            "Lol chill tho",
+                                            "QBot: Out!",
                                             event_id_global))
+
+    # Further parsing for actual messages
+    if msg_type == 'message' and not event.get('subtype'):
+        parse_message(websocket,
+                      event.get('user'),
+                      event.get('text'))
+
+
+def parse_message(websocket, user, text):
+    """Parse messages to determine and send appropriate response"""
+
+    plain_text = text.strip().lower()
+
+    # If the message indicates that they're on their way to someone:
+    if is_dequeue_message(text):
+        # TODO: Restrict to staff
+
+        # Find the user they're trying to pop
+        user_to_pop = re.search('<@.+>', text)
+        if user_to_pop:
+            user_to_pop = user_to_pop.group(0)
+            EVENT_LOOP.create_task(send_message(websocket,
+                                                "They're on their way {}".format(user_to_pop),
+                                                event_id_global))
+
+    # If the message indicates they want to be added to the queue:
+    elif is_enqueue_message(text):
+        EVENT_LOOP.create_task(send_message(websocket,
+                                            "Adding to the queue <@{}>".format(user),
+                                            event_id_global))
+
+    # If no other conditons met
+    else:
+        EVENT_LOOP.create_task(send_message(websocket,
+                                            "Sorry <@{}>, I didn't understand that!".format(user),
+                                            event_id_global))
+
+
+def is_enqueue_message(text):
+    """Return whether text is message to pop someone from queue"""
+
+    plain_text = text.strip().lower()
+    return (plain_text.startswith('omw')
+            or plain_text.startswith('dequeue')
+            or plain_text.startswith('dq')
+            or plain_text.startswith('deq'))
+
+
+def is_dequeue_message(text):
+    """Return where text is message to add self to queue"""
+
+    plain_text = text.strip().lower()
+    return (plain_text.startswith('enqueue')
+            or plain_text.startswith('enq')
+            or plain_text.startswith('nq'))
+
 
 
 async def send_message(websocket, msg, local_event_id, channel='C77DZM4F9'):
@@ -80,12 +146,13 @@ async def send_message(websocket, msg, local_event_id, channel='C77DZM4F9'):
     global event_id_global
     event_id_global += 1
 
+    # Send the message to Slack
     msg_json = json.dumps({'id': local_event_id,
                            'type': 'message',
                            'channel': channel,
                            'text': msg})
-    print("Sending message {}...".format(local_event_id))
-    await asyncio.sleep(5)
+    print("Sending message {}: {}...".format(local_event_id, msg))
+    # await asyncio.sleep(5)
     await websocket.send(msg_json)
     print("Sent message {}!".format(local_event_id))
 
