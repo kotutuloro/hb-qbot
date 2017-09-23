@@ -44,8 +44,6 @@ async def receive_events(ws_url):
         global sent_responses
         sent_responses = {}
 
-        # TODO: Create a ping coro to ping every x seconds and add to event loop
-
         # Continue waiting for event messages until websocket closes or errors
         while True:
             print("Waiting for events...")
@@ -103,15 +101,13 @@ def respond_to_message(user, text):
 
     potential_new_queue = parsing.get_queue_change(text)
 
-    # If the message is to print or reform the queue
+    # If the message is to recreate/override the queue
     if potential_new_queue is not None:
-        # TODO: Restrict to staff
         print("I would change the queue now!")
         response_msg = f"{str(potential_new_queue)}"
 
     # If the message indicates that they're on their way to someone:
     elif parsing.is_dequeue_message(text):
-        # TODO: Restrict to staff or self
 
         # Find the user they're trying to pop
         user_to_pop = parsing.get_user_to_pop(text)
@@ -132,7 +128,6 @@ def respond_to_message(user, text):
     else:
         response_msg = f"Sorry {user}, I didn't understand that.\nType 'qbot help' to see a list of commands."
 
-    # TODO: Print the actual queue here
     return response_msg
 
 

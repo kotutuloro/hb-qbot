@@ -1,4 +1,4 @@
 *.pyc
 env/
-
 secrets.sh
+TODO.txt
