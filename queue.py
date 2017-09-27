@@ -1,4 +1,5 @@
 """Classes for the queue"""
+import random
 
 
 class Node(object):
@@ -79,8 +80,13 @@ class LinkedList(object):
 class Queue(object):
     """Hackbright Queue class"""
 
+    standard_emoji = ['unicorn_face', 'robot_face', 'stuck_out_tongue_closed_eyes', 'whale', 'octopus', 'open_book',
+                      'earth_americas', 'frog', 'thinking_face', 'blowfish', 'bento', 'balloon', 'dancers', 'guitar',
+                      'sunflower', 'lion_face', 'fire', 'elephant', 'hatched_chick', 'dog', 'spider_web', 'eyes']
+
     def __init__(self):
         self._list = LinkedList()
+        self.emoji = set(Queue.standard_emoji)
 
     def push(self, value):
         """Add an element to the end of the linked list"""
@@ -127,7 +133,7 @@ class Queue(object):
 
         # Add a random emoji for empty queues
         if self.is_empty():
-            q_str += ":emoji: "
+            q_str += f":{ random.sample(self.emoji, 1)[0] }: "
 
         q_str += "]"
 
