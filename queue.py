@@ -55,7 +55,7 @@ class LinkedList(object):
     def find(self, value):
         """Return whether node with matching data is in linked list"""
 
-        curr = self.head:
+        curr = self.head
         while curr:
             if curr.data == value:
                 return True
@@ -77,21 +77,35 @@ class Queue(object):
     def __init__(self):
         self._list = LinkedList()
 
-    def push(self):
+    def push(self, value):
         """Add an element to the end of the linked list"""
-        pass
+
+        self._list.append(value)
 
     def pop(self):
         """Remove the first element from the linked list"""
-        pass
+
+        if self.is_empty():
+            return None
+        else:
+            return self._list.remove(self._list.head.data)
 
     def peek(self):
-        """Return first element in queue without modifying linked list"""
-        pass
+        """Return first user in queue without modifying linked list"""
+
+        if self.is_empty():
+            return None
+        else:
+            return self._list.head.data
 
     def is_empty(self):
         """Return boolean for whether the queue is empty"""
-        pass
+
+        return self._list.head is None
+
+    def empty(self):
+        """Empty the queue"""
+        self._list = LinkedList()
 
     def __repr__(self):
         """Representation of the queue"""
@@ -99,4 +113,20 @@ class Queue(object):
 
     def __str__(self):
         """String format for the queue"""
-        return "I'll figure this out later"
+
+        q_str = "[ "
+
+        # Add a random emoji for empty queues
+        if self.is_empty():
+            q_str += ":emoji: "
+
+        # Add each node's data to the string
+        else:
+            curr = self._list.head
+            while curr:
+                q_str += curr.data + " "
+                curr = curr.next
+
+        q_str += "]"
+
+        return q_str
