@@ -130,14 +130,19 @@ def respond_to_message(user, text):
         else:
             HB_QUEUE.push(user)
 
-    # Return help message for calls to self and stop there
+    # Return help message
     elif parsing.is_help_message(text):
         response_msg = f"Here's where a helpful message would go!\n"
 
-    # If no other conditons met, send confusion message and stop there
-    else:
-        response_msg = f"Sorry {user}, I didn't understand that.\nType 'qbot help' to see a list of commands.\n"
+    # Return a status update
+    elif parsing.is_status_message(text):
+        response_msg = "Qbot is up and running!\nType 'qbot help' to see a list of commands.\n"
 
+    # If none of the conditions are met, return None
+    else:
+        return
+
+    # Return the specified message (if any) and the queue
     return response_msg + str(HB_QUEUE)
 
 

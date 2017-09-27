@@ -77,3 +77,10 @@ def is_help_message(text):
 
     plain_text = text.strip().lower()
     return bool(re.search(r'^(qbot|queuebot)\b.+\bhelp\b', plain_text))
+
+
+def is_status_message(text):
+    """Return whether text is asking for a status update"""
+
+    plain_text = text.strip().lower()
+    return bool(re.search(r'^(q|queue)(bot)?\b.+\bstatus\b', plain_text))
