@@ -5,8 +5,10 @@ import websockets
 import json
 
 import parsing
+from myqueue import Queue
 
 EVENT_LOOP = asyncio.get_event_loop()
+HB_QUEUE = Queue()
 
 
 def check_secrets_sourced():
@@ -100,11 +102,11 @@ def respond_to_message(user, text):
     """Parse messages to determine and return appropriate response"""
 
     potential_new_queue = parsing.get_queue_change(text)
+    response_msg = ''
 
     # If the message is to recreate/override the queue
     if potential_new_queue is not None:
-        print("I would change the queue now!")
-        response_msg = f"{str(potential_new_queue)}"
+        HB_QUEUE.override(potential_new_queue)
 
     # If the message indicates that they're on their way to someone:
     elif parsing.is_dequeue_message(text):
@@ -112,23 +114,31 @@ def respond_to_message(user, text):
         # Find the user they're trying to pop
         user_to_pop = parsing.get_user_to_pop(text)
         if user_to_pop:
-            response_msg = f"They're on their way {user_to_pop}"
+            if user_to_pop == HB_QUEUE.peek():
+                HB_QUEUE.pop()
+            elif user_to_pop == user:
+                HB_QUEUE.remove(user)
+            else:
+                response_msg = f"First in, first out! You can't dequeue that person yet {user}.\n"
         else:
-            response_msg = "Lol who you even tryna pop?"
+            response_msg = f"Please specify who you want to dequeue {user}.\n"
 
     # If the message indicates they want to be added to the queue:
     elif parsing.is_enqueue_message(text):
-        response_msg = f"Adding to the queue {user}"
+        if HB_QUEUE.has_user(user):
+            response_msg = f"You're already in the queue {user}.\n"
+        else:
+            HB_QUEUE.push(user)
 
     # Return help message for calls to self and stop there
     elif parsing.is_help_message(text):
-        response_msg = f"Here's where a helpful message would go!"
+        response_msg = f"Here's where a helpful message would go!\n"
 
     # If no other conditons met, send confusion message and stop there
     else:
-        response_msg = f"Sorry {user}, I didn't understand that.\nType 'qbot help' to see a list of commands."
+        response_msg = f"Sorry {user}, I didn't understand that.\nType 'qbot help' to see a list of commands.\n"
 
-    return response_msg
+    return response_msg + str(HB_QUEUE)
 
 
 async def send_message(websocket, msg, local_event_id, channel='C77DZM4F9'):

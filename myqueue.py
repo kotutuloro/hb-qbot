@@ -93,13 +93,18 @@ class Queue(object):
 
         self._list.append(value)
 
+    def remove(self, value):
+        """Remove an element with the given value"""
+
+        self._list.remove(value)
+
     def pop(self):
         """Remove the first element from the linked list"""
 
         if self.is_empty():
             return None
         else:
-            return self._list.remove(self._list.head.data)
+            return self.remove(self._list.head.data)
 
     def peek(self):
         """Return first user in queue without modifying linked list"""
@@ -109,6 +114,11 @@ class Queue(object):
         else:
             return self._list.head.data
 
+    def has_user(self, user):
+        """Returns whether given user is in the queue"""
+
+        return self._list.find(user)
+
     def is_empty(self):
         """Return boolean for whether the queue is empty"""
 
@@ -116,7 +126,15 @@ class Queue(object):
 
     def empty(self):
         """Empty the queue"""
+
         self._list = LinkedList()
+
+    def override(self, new_list):
+        """Override the current queue with the given list"""
+
+        self.empty()
+        for item in new_list:
+            self.push(item)
 
     def __repr__(self):
         """Representation of the queue"""
@@ -125,7 +143,7 @@ class Queue(object):
     def __str__(self):
         """String format for the queue"""
 
-        q_str = "[ "
+        q_str = "QUEUE = [ "
 
         # Add each node's data to the string
         for node in self._list.all():
