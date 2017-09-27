@@ -36,31 +36,36 @@ class LinkedList(object):
         """Remove and return node with matching data from linked list"""
 
         prev = None
-        curr = self.head
 
-        while curr:
-            if curr.data == value:
-                if curr is self.head:
-                    self.head = curr.next
+        for node in self.all():
+            if node.data == value:
+                if node is self.head:
+                    self.head = node.next
                 else:
-                    prev.next = curr.next
-                if curr is self.tail:
+                    prev.next = node.next
+                if node is self.tail:
                     self.tail = prev
-                return curr
-            prev = curr
-            curr = curr.next
+                return node
+            prev = node
 
         return None
 
     def find(self, value):
         """Return whether node with matching data is in linked list"""
 
+        for node in self.all():
+            if node.data == value:
+                return True
+
+        return False
+
+    def all(self):
+        """Generator object that yields next item in the linked list"""
+
         curr = self.head
         while curr:
-            if curr.data == value:
-                return True
+            yield curr
             curr = curr.next
-        return False
 
     def __repr__(self):
         """Representation of the queue"""
@@ -116,16 +121,13 @@ class Queue(object):
 
         q_str = "[ "
 
+        # Add each node's data to the string
+        for node in self._list.all():
+            q_str += node.data + " "
+
         # Add a random emoji for empty queues
         if self.is_empty():
             q_str += ":emoji: "
-
-        # Add each node's data to the string
-        else:
-            curr = self._list.head
-            while curr:
-                q_str += curr.data + " "
-                curr = curr.next
 
         q_str += "]"
 
