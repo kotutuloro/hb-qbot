@@ -38,6 +38,8 @@ async def receive_events(ws_url):
     """Connect to websocket URL and await received messages"""
 
     async with websockets.connect(ws_url) as websocket:
+        print("Opened connection!")
+
         # Set global event ID variable to 1
         global event_id_global
         event_id_global = 1
@@ -170,12 +172,22 @@ async def send_message(websocket, msg, local_event_id, channel='C77DZM4F9'):
     sent_responses[local_event_id] = None
 
 
-if __name__ == '__main__':
+def main():
+    """Recursive main function to maintain continuous qbot connection"""
+
     token = check_secrets_sourced()
     websocket_url = connect(token)
 
     try:
         EVENT_LOOP.run_until_complete(receive_events(websocket_url))
+    except websockets.exceptions.ConnectionClosed:
+        print("Connection closed :(")
+        print("Restarting...")
+        main()
     except KeyboardInterrupt:
         EVENT_LOOP.stop()
         print("\n*Stopped*")
+
+
+if __name__ == '__main__':
+    main()
