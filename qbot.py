@@ -10,6 +10,9 @@ from myqueue import Queue
 EVENT_LOOP = asyncio.get_event_loop()
 HB_QUEUE = Queue()
 
+# qbtesting channel of the queuebottest Slack
+CHANNEL_ID = 'C77DZM4F9'
+
 
 def check_secrets_sourced():
     """Errors out if Slack API key not found"""
@@ -93,7 +96,7 @@ def parse_event(websocket, event):
         add_message_task("QBot: Out!")
 
     # Further parsing for actual messages (ignoring things like channel join msgs)
-    if msg_type == 'message' and not event.get('subtype'):
+    if msg_type == 'message' and event.get('channel') == CHANNEL_ID and not event.get('subtype'):
         response_msg = respond_to_message(f"<@{event.get('user')}>",
                                           event.get('text'))
         if response_msg:
@@ -148,13 +151,12 @@ def respond_to_message(user, text):
     return response_msg + str(HB_QUEUE)
 
 
-async def send_message(websocket, msg, local_event_id, channel='C77DZM4F9'):
+async def send_message(websocket, msg, local_event_id, channel=CHANNEL_ID):
     """Send a message across the websocket to the specified channel
 
     Takes a websocket object, a message to send, an (local) event id to attach
     to the message, and an optional channel to send the message to. If a channel
-    is not given, it will default to the qbtesting channel of the queuebottest
-    Slack.
+    is not given, it will default to the global variable specified.
     """
 
     # Send the message to Slack
