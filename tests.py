@@ -22,6 +22,9 @@ class TestParsing(unittest.TestCase):
         enqueue_text = "Enqueue"
         self.assertTrue(parsing.is_enqueue_message(enqueue_text), msg=f"Text: {enqueue_text}")
 
+        nqueue_text = "nqueue me~"
+        self.assertTrue(parsing.is_enqueue_message(nqueue_text), msg=f"Text: {nqueue_text}")
+
         enq_text = "   enq me please"
         self.assertTrue(parsing.is_enqueue_message(enq_text), msg=f"Text: {enq_text}")
 
@@ -43,6 +46,9 @@ class TestParsing(unittest.TestCase):
     def test_is_dequeue_message(self):
         dequeue_text = "Dequeue"
         self.assertTrue(parsing.is_dequeue_message(dequeue_text), msg=f"Text: {dequeue_text}")
+
+        dqueue_text = "dqueue dairy queen"
+        self.assertTrue(parsing.is_dequeue_message(dqueue_text), msg=f"Text: {dqueue_text}")
 
         deq_text = "   deq me please thx"
         self.assertTrue(parsing.is_dequeue_message(deq_text), msg=f"Text: {deq_text}")
@@ -73,6 +79,10 @@ class TestParsing(unittest.TestCase):
         tiny_user_text = "<@x>"
         tiny_user = parsing.get_user_to_pop(tiny_user_text)
         self.assertEqual(tiny_user, '<@x>', msg=f"Text: {tiny_user_text}")
+
+        first_user_text = "<@x123> <@y456>"
+        first_user = parsing.get_user_to_pop(first_user_text)
+        self.assertEqual(first_user, '<@x123>', msg=f"Text: {first_user_text}")
 
         no_user_text = "these are not the users you're looking for"
         no_user = parsing.get_user_to_pop(no_user_text)

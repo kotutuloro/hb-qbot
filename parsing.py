@@ -6,7 +6,7 @@ import re
 def is_enqueue_message(text):
     """Return whether text is message to add self to queue
 
-    Check if the text starts with 'enq', 'nq', or 'enqueue'
+    Check if the text starts with 'enq', 'nq', 'enqueue', or 'nqueue'
 
     >>> is_enqueue_message("Enqueue")
     True
@@ -22,14 +22,14 @@ def is_enqueue_message(text):
     """
 
     plain_text = text.strip().lower()
-    search_re = r'^(enqueue|enq|nq)\b'
+    search_re = r'^e?nq(ueue)?\b'
     return bool(re.search(search_re, plain_text))
 
 
 def is_dequeue_message(text):
     """Return whether text is message to pop someone from queue
 
-    Check if the text starts with 'omw', deq', 'dq', or 'dequeue'.
+    Check if the text starts with 'omw', deq', 'dq', 'dequeue', or 'dqueue'.
 
     >>> is_dequeue_message("omw <@U12345678>!")
     True
@@ -47,7 +47,7 @@ def is_dequeue_message(text):
     """
 
     plain_text = text.strip().lower()
-    search_re = r'^(omw|dequeue|deq|dq)\b'
+    search_re = r'^(omw|de?q(ueue)?)\b'
     return bool(re.search(search_re, plain_text))
 
 
@@ -79,7 +79,7 @@ def get_queue_change(text):
 
     # Construct regex for things like: queue.empty(), q.clear(  ), queue=[],
     # QUEUE = [ <@User1234> <@U1234here>   ]
-    re_queue_name_alt = r'(q|queue)'
+    re_queue_name_alt = r'q(ueue)?'
     re_clear_method_alt = r'\.(clear|empty)\(\s*\)'
     re_usernames = r'(<@\w+>\s*)*'
     re_list = rf'\s*=\s*\[\s*({ re_usernames })\s*\]'
@@ -124,7 +124,7 @@ def is_help_message(text):
     """
 
     plain_text = text.strip().lower()
-    return bool(re.search(r'^(qbot|queuebot)\b.+\bhelp\b', plain_text))
+    return bool(re.search(r'^q(ueue)?bot\b.+\bhelp\b', plain_text))
 
 
 def is_status_message(text):
@@ -141,4 +141,4 @@ def is_status_message(text):
     """
 
     plain_text = text.strip().lower()
-    return bool(re.search(r'^(q|queue)(bot)?\b.+\bstatus\b', plain_text))
+    return bool(re.search(r'^q(ueue)?(bot)?\b.+\bstatus\b', plain_text))
