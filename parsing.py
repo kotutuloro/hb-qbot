@@ -7,6 +7,18 @@ def is_enqueue_message(text):
     """Return whether text is message to add self to queue
 
     Check if the text starts with 'enq', 'nq', or 'enqueue'
+
+    >>> is_enqueue_message("Enqueue")
+    True
+    >>> is_enqueue_message("ENQ!!")
+    True
+    >>> is_enqueue_message("nq please thanks")
+    True
+
+    >>> is_enqueue_message("I am want to be enqueue")
+    False
+    >>> is_enqueue_message("nqqqqqqq")
+    False
     """
 
     plain_text = text.strip().lower()
@@ -18,6 +30,20 @@ def is_dequeue_message(text):
     """Return whether text is message to pop someone from queue
 
     Check if the text starts with 'omw', deq', 'dq', or 'dequeue'.
+
+    >>> is_dequeue_message("omw <@U12345678>!")
+    True
+    >>> is_dequeue_message("Dequeue")
+    True
+    >>> is_dequeue_message("DEQ!!")
+    True
+    >>> is_dequeue_message("dq me pls & ty")
+    True
+
+    >>> is_dequeue_message("I am want to be dequeue")
+    False
+    >>> is_dequeue_message("dqqqqqqq")
+    False
     """
 
     plain_text = text.strip().lower()
@@ -26,7 +52,13 @@ def is_dequeue_message(text):
 
 
 def get_user_to_pop(text):
-    """Return the requested user to dequeue, or None if no user"""
+    """Return the first user mentioned, or None if no user
+
+    >>> get_user_to_pop("give me <@User1234>")
+    '<@User1234>'
+    >>> get_user_to_pop("no user here")
+    >>> get_user_to_pop("none here either <@  >")
+    """
 
     match = re.search(r'<@\w+>', text)
     if match:
@@ -36,7 +68,14 @@ def get_user_to_pop(text):
 
 
 def get_queue_change(text):
-    """Return list of users to construct the queue, or None if no valid changes"""
+    """Return list of users to construct the queue, or None if no valid changes
+
+    >>> get_queue_change("QUEUE.empty()")
+    []
+    >>> get_queue_change("q = [ <@U1234> <@xyz123> ]")
+    ['<@U1234>', '<@xyz123>']
+    >>> get_queue_change("This isn't a real queue change")
+    """
 
     # Construct regex for things like: queue.empty(), q.clear(  ), queue=[],
     # QUEUE = [ <@User1234> <@U1234here>   ]
@@ -73,6 +112,15 @@ def is_help_message(text):
     """Return whether text is asking for a list of commands
 
     Check if the text starts with qbot or queuebot and has the word 'help'
+
+    >>> is_help_message("qbot help please")
+    True
+    >>> is_help_message("queuebot come help me thx")
+    True
+    >>> is_help_message("queuebot to the rescue")
+    False
+    >>> is_help_message("hey qbot help me out")
+    False
     """
 
     plain_text = text.strip().lower()
@@ -80,7 +128,17 @@ def is_help_message(text):
 
 
 def is_status_message(text):
-    """Return whether text is asking for a status update"""
+    """Return whether text is asking for a status update
+
+    Check if the text starts with q or queue (bot) and has the word 'status'
+
+    >>> is_status_message("queue status update please")
+    True
+    >>> is_status_message("qbot, what's your status?")
+    True
+    >>> is_status_message("status of the queue")
+    False
+    """
 
     plain_text = text.strip().lower()
     return bool(re.search(r'^(q|queue)(bot)?\b.+\bstatus\b', plain_text))
