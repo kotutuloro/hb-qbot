@@ -12,7 +12,78 @@ class TestQbot(unittest.TestCase):
 
 class TestQueue(unittest.TestCase):
     """Tests for the Queue class"""
-    pass
+
+    def setUp(self):
+        self.q = myqueue.Queue()
+        self.q.push('first')
+        self.q.push('second')
+        self.q.push('last')
+
+        self.empty_q = myqueue.Queue()
+
+    def test_queue(self):
+        self.assertIsInstance(self.q._list, myqueue.LinkedList)
+        self.assertIsInstance(self.q.emoji, set)
+
+    def test_queue_push(self):
+        self.q.push('another last')
+        self.assertEqual(self.q._list.head.data, 'first')
+        self.assertEqual(self.q._list.tail.data, 'another last')
+
+    def test_queue_remove(self):
+        self.q.remove('none')
+        self.assertEqual(self.q._list.head.data, 'first')
+        self.assertEqual(self.q._list.tail.data, 'last')
+
+        self.q.remove('first')
+        self.assertEqual(self.q._list.head.data, 'second')
+        self.assertEqual(self.q._list.tail.data, 'last')
+
+    def test_queue_pop(self):
+        self.assertEqual(self.q._list.head.data, 'first')
+        self.q.pop()
+        self.assertEqual(self.q._list.head.data, 'second')
+
+        self.assertIsNone(self.empty_q._list.head)
+        self.empty_q.pop()
+        self.assertIsNone(self.empty_q._list.head)
+
+    def test_queue_peek(self):
+        self.assertIsNone(self.empty_q.peek())
+        self.assertEqual(self.q.peek(), 'first')
+
+    def test_queue_has_user(self):
+        found_none = self.q.has_user('none')
+        self.assertFalse(found_none)
+
+        found_second = self.q.has_user('second')
+        self.assertTrue(found_second)
+
+    def test_queue_is_empty(self):
+        self.assertTrue(self.empty_q.is_empty())
+        self.assertFalse(self.q.is_empty())
+
+    def test_queue_empty(self):
+        self.assertIsNotNone(self.q._list.head)
+
+        self.q.empty()
+        self.assertIsNone(self.q._list.head)
+
+    def test_queue_override(self):
+        self.q.override(['a', 'b', 'c'])
+        self.assertEqual(self.q._list.head.data, 'a')
+        self.assertEqual(self.q._list.tail.data, 'c')
+
+        self.q.override([])
+        self.assertTrue(self.q.is_empty())
+
+    def test_queue_str(self):
+        str_q = str(self.q)
+        self.assertEqual(str_q, "QUEUE = [ first second last ]")
+
+        self.empty_q.emoji = ['only']
+        empty_str_q = str(self.empty_q)
+        self.assertEqual(empty_str_q, "QUEUE = [ :only: ]")
 
 
 class TestLinkedList(unittest.TestCase):
