@@ -11,8 +11,98 @@ class TestQbot(unittest.TestCase):
 
 
 class TestQueue(unittest.TestCase):
-    """Tests for the Queue and related classes"""
+    """Tests for the Queue class"""
     pass
+
+
+class TestLinkedList(unittest.TestCase):
+    """Tests for the Linked List (and Node) class"""
+
+    def setUp(self):
+        self.ll = myqueue.LinkedList()
+
+    def test_node(self):
+        berry_node = myqueue.Node("berry")
+        apple_node = myqueue.Node("apple", berry_node)
+        self.assertEqual(apple_node.data, "apple")
+        self.assertEqual(berry_node.data, "berry")
+
+        self.assertIs(apple_node.next, berry_node)
+        self.assertIsNone(berry_node.next)
+
+    def test_linked_list(self):
+        self.assertIsNone(self.ll.head)
+        self.assertIsNone(self.ll.tail)
+
+    def test_ll_append(self):
+        self.ll.append('a')
+        self.assertIsInstance(self.ll.head, myqueue.Node)
+        self.assertIs(self.ll.head, self.ll.tail)
+        self.assertEqual(self.ll.head.data, 'a')
+
+        self.ll.append('b')
+        self.assertIsNot(self.ll.head, self.ll.tail)
+        self.assertEqual(self.ll.tail.data, 'b')
+
+    def test_ll_remove(self):
+        found_none = self.ll.remove('empty')
+        self.assertIsNone(found_none)
+
+        self.ll.append('a')
+        self.ll.append('b')
+        self.ll.append('c')
+        self.ll.append('d')
+        # a -> b -> c -> d
+
+        found_mid = self.ll.remove('b')
+        # a -> c -> d
+        self.assertEqual(found_mid.data, 'b')
+        self.assertEqual(self.ll.head.data, 'a')
+        self.assertIs(self.ll.head.next.data, 'c')
+
+        found_head = self.ll.remove('a')
+        # c -> d
+        self.assertEqual(found_head.data, 'a')
+        self.assertEqual(self.ll.head.data, 'c')
+        self.assertEqual(self.ll.head.next.data, 'd')
+
+        found_tail = self.ll.remove('d')
+        # c
+        self.assertEqual(found_tail.data, 'd')
+        self.assertEqual(self.ll.tail.data, 'c')
+
+        found_only = self.ll.remove('c')
+        self.assertEqual(found_only.data, 'c')
+        self.assertIsNone(self.ll.head)
+        self.assertIsNone(self.ll.tail)
+
+    def test_ll_find(self):
+        self.ll.append('a')
+        self.ll.append('b')
+
+        found_none = self.ll.find('x')
+        self.assertFalse(found_none)
+
+        found_a = self.ll.find('a')
+        self.assertTrue(found_a)
+
+    def test_ll_all(self):
+        empty_ll = [node for node in self.ll.all()]
+        self.assertEqual(empty_ll, [])
+
+        self.ll.append('a')
+        self.ll.append('b')
+        two_item_ll = [node for node in self.ll.all()]
+        self.assertEqual(len(two_item_ll), 2)
+        self.assertIs(two_item_ll[0], self.ll.head)
+        self.assertIs(two_item_ll[-1], self.ll.tail)
+
+    def test_ll_repr(self):
+        self.assertEqual(repr(self.ll), "<Linked List: head=None tail=None>")
+
+        self.ll.append('a')
+        self.ll.append('b')
+        self.assertEqual(repr(self.ll), "<Linked List: head=a tail=b>")
 
 
 class TestParsing(unittest.TestCase):
