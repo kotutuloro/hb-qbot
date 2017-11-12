@@ -91,6 +91,12 @@ class TestLinkedList(unittest.TestCase):
 
     def setUp(self):
         self.ll = myqueue.LinkedList()
+        self.ll.append('a')
+        self.ll.append('b')
+        self.ll.append('c')
+        self.ll.append('d')
+
+        self.empty_ll = myqueue.LinkedList()
 
     def test_node(self):
         berry_node = myqueue.Node("berry")
@@ -102,28 +108,24 @@ class TestLinkedList(unittest.TestCase):
         self.assertIsNone(berry_node.next)
 
     def test_linked_list(self):
-        self.assertIsNone(self.ll.head)
-        self.assertIsNone(self.ll.tail)
+        self.assertIsInstance(self.ll.head, myqueue.Node)
+
+        self.assertIsNone(self.empty_ll.head)
+        self.assertIsNone(self.empty_ll.tail)
 
     def test_ll_append(self):
-        self.ll.append('a')
-        self.assertIsInstance(self.ll.head, myqueue.Node)
-        self.assertIs(self.ll.head, self.ll.tail)
-        self.assertEqual(self.ll.head.data, 'a')
+        self.empty_ll.append('a')
+        self.assertIs(self.empty_ll.head, self.empty_ll.tail)
+        self.assertEqual(self.empty_ll.head.data, 'a')
 
-        self.ll.append('b')
-        self.assertIsNot(self.ll.head, self.ll.tail)
-        self.assertEqual(self.ll.tail.data, 'b')
+        self.empty_ll.append('b')
+        self.assertIsNot(self.empty_ll.head, self.empty_ll.tail)
+        self.assertEqual(self.empty_ll.tail.data, 'b')
 
     def test_ll_remove(self):
         found_none = self.ll.remove('empty')
-        self.assertIsNone(found_none)
-
-        self.ll.append('a')
-        self.ll.append('b')
-        self.ll.append('c')
-        self.ll.append('d')
         # a -> b -> c -> d
+        self.assertIsNone(found_none)
 
         found_mid = self.ll.remove('b')
         # a -> c -> d
@@ -148,9 +150,6 @@ class TestLinkedList(unittest.TestCase):
         self.assertIsNone(self.ll.tail)
 
     def test_ll_find(self):
-        self.ll.append('a')
-        self.ll.append('b')
-
         found_none = self.ll.find('x')
         self.assertFalse(found_none)
 
@@ -158,22 +157,18 @@ class TestLinkedList(unittest.TestCase):
         self.assertTrue(found_a)
 
     def test_ll_all(self):
-        empty_ll = [node for node in self.ll.all()]
-        self.assertEqual(empty_ll, [])
+        empty = [node for node in self.empty_ll.all()]
+        self.assertEqual(empty, [])
 
-        self.ll.append('a')
-        self.ll.append('b')
-        two_item_ll = [node for node in self.ll.all()]
-        self.assertEqual(len(two_item_ll), 2)
-        self.assertIs(two_item_ll[0], self.ll.head)
-        self.assertIs(two_item_ll[-1], self.ll.tail)
+        full = [node for node in self.ll.all()]
+        self.assertEqual(len(full), 4)
+        self.assertIs(full[0], self.ll.head)
+        self.assertIs(full[-1], self.ll.tail)
 
     def test_ll_repr(self):
-        self.assertEqual(repr(self.ll), "<Linked List: head=None tail=None>")
+        self.assertEqual(repr(self.empty_ll), "<Linked List: head=None tail=None>")
 
-        self.ll.append('a')
-        self.ll.append('b')
-        self.assertEqual(repr(self.ll), "<Linked List: head=a tail=b>")
+        self.assertEqual(repr(self.ll), "<Linked List: head=a tail=d>")
 
 
 class TestParsing(unittest.TestCase):
