@@ -1,13 +1,48 @@
 import unittest
+import requests
 
 import qbot
 import myqueue
 import parsing
 
+import mocks
+
 
 class TestQbot(unittest.TestCase):
     """Tests for the QBot"""
-    pass
+
+    def setUp(self):
+        requests.post = mocks.post_request
+        # Probably something with resetting qbot.EVENT_LOOP & qbot.HB_QUEUE
+        # Also setting up a websocket?
+
+    def test_secrets_sourced(self):
+        import os
+
+        os.environ['SLACK_BOT_TOKEN'] = 'abc123xyz'
+        self.assertEqual('abc123xyz', qbot.check_secrets_sourced())
+
+        os.environ.pop('SLACK_BOT_TOKEN', None)
+        self.assertRaises(ValueError, qbot.check_secrets_sourced)
+
+    def test_connect(self):
+        good_url = qbot.connect('good-token')
+        self.assertEqual(good_url, 'websock.et/url')
+
+        no_url = qbot.connect('bad-token')
+        self.assertIsNone(no_url)
+
+    def test_receive_events(self):
+        pass
+
+    def test_parse_event(self):
+        pass
+
+    def test_response_to_message(self):
+        pass
+
+    def test_sent_message(self):
+        pass
 
 
 class TestQueue(unittest.TestCase):
