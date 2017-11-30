@@ -13,8 +13,12 @@ class TestQbot(unittest.TestCase):
 
     def setUp(self):
         requests.post = mocks.post_request
-        # Probably something with resetting qbot.EVENT_LOOP & qbot.HB_QUEUE
-        # Also setting up a websocket?
+        # qbot.EVENT_LOOP = something
+        # qbot.HB_QUEUE = something
+        # qbot.CHANNEL_ID = 'ABC123ID'
+        # asyncio.get_event_loop().run_until_complete(mocks.start_server)
+        # asyncio.get_event_loop().run_forever()
+        # self.ws_url = 'ws://localhost:8765'
 
     def test_secrets_sourced(self):
         import os
