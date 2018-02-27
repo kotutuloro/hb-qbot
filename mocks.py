@@ -37,3 +37,16 @@ def mock_no_response():
     response._content = b'{}'
 
     return response
+
+
+
+async def hello(websocket, path):
+    name = await websocket.recv()
+    print("< {}".format(name))
+
+    greeting = "Hello {}!".format(name)
+    await websocket.send(greeting)
+    print("> {}".format(greeting))
+
+import websockets
+start_server = websockets.serve(hello, 'localhost', 8765)
